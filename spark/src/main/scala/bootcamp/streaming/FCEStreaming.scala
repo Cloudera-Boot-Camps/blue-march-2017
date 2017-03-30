@@ -1,4 +1,4 @@
-package bootcamp.streaming
+package bootcamp.streaming.executor
 
 import kafka.serializer.StringDecoder
 import org.apache.spark.streaming.dstream.DStream
@@ -44,10 +44,9 @@ object FCEStreaming {
   def execute(master: Option[String],
               streamingParameters: Map[String,String],
               topics: Set[String],
-              kafkaParameters: Map[String,String],
-              jars: Seq[String] = Nil): Unit = {
+              kafkaParameters: Map[String,String]): Unit = {
     val sc = {
-      val conf = new SparkConf().setAppName(AppName).setJars(jars)
+      val conf = new SparkConf().setAppName(AppName)
       for (m <- master) {
         conf.setMaster(m)
       }
