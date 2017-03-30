@@ -8,7 +8,9 @@ case class Measurement(
   measurement_time: Long,
   amplitude_1: Float,
   amplitude_2: Float,
-  amplitude_3: Float)
+  amplitude_3: Float) {
+  def isAnomaly = (amplitude_1>0.995 && amplitude_3 > 0.995 && amplitude_2 < 0.005)
+}
 
 object MeasurementString {
   val MeasurementRegex = "([\\w-]+),(\\d+),(\\d+),(\\d+),([\\d]+),([\\d\\.]+),([\\d\\.]+),([\\d\\.]+)".r
