@@ -1,4 +1,6 @@
-package bootcamp.streaming
+package bootcamp.streaming.main
+
+import bootcamp.streaming.executor.FCEStreaming
 
 
 object FCEStreamingMain {
