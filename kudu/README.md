@@ -72,3 +72,54 @@ Query progress can be monitored at: http://ip-172-31-9-124.us-west-2.compute.int
 +-------------+------------------+
 Fetched 8 row(s) in 0.14s
 ```
+
+## Measurements Table
+```
+create TABLE presentation.measurements_kudu (
+     month_key int,
+     measurement_id string, 
+	 detector_id int, 
+	 galaxy_id int, 
+	 astrophysicist_id int, 
+	 measurement_time bigint, 
+	 amplitude_1 float, 
+	 amplitude_2 float, 
+	 amplitude_3 float,
+   primary key(measurement_id, month_key)
+)
+partition by HASH(month_key) partitions 3,
+  RANGE(month_key) (
+    PARTITION VALUE = 201703,
+    PARTITION VALUE = 201704
+  )
+STORED AS KUDU;
+
+
+--insert some data
+insert into presentation.measurements_kudu
+values(201703, 'fdjksalf;dsa', 1, 2, 3, 123456789, 0.993, 0.3242, 0.93214);
+insert into presentation.measurements_kudu
+values(201704, 'fdjksalf;dsa', 1, 2, 3, 123456789, 0.993, 0.3242, 0.93214);
+insert into presentation.measurements_kudu
+values(201705, 'fdjksalf;dsa', 1, 2, 3, 123456789, 0.993, 0.3242, 0.93214);
+--
+select count(*) from presentation.measurements_kudu;
+--WAT.gif
+
+--ok then add a partition for the last one
+ALTER TABLE presentation.measurements_kudu ADD RANGE PARTITION VALUE = 201705;
+insert into presentation.measurements_kudu
+values(201705, 'fdjksalf;dsa', 1, 2, 3, 123456789, 0.993, 0.3242, 0.93214);
+select count(*) from presentation.measurements_kudu;
+
+
+--summary, ignores records outside of the partition range, from HUE at least no errors are visible.
+ALTER TABLE presentation.measurements_kudu ADD RANGE PARTITION VALUE = 201706;
+ALTER TABLE presentation.measurements_kudu ADD RANGE PARTITION VALUE = 201708;
+
+insert into presentation.measurements_kudu
+values(201707, 'fdjksalf;dsa', 1, 2, 3, 123456789, 0.993, 0.3242, 0.93214);
+
+--since the range uses '=' it must be an exact match, I think there is an option to have >=..
+ PARTITION [lower_val <[=]] VALUES [upper_val <[=]] | PARTITION VALUE = (val_1 [,... val_n]) 
+ ```
