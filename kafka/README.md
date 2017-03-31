@@ -8,6 +8,12 @@
 - notes
   - Repilication-factor is limited by the maximum number of kafka brokers
 
+## List topics
+- Command
+```
+/usr/bin/kafka-topics --list --zookeeper <zookeeper hostname>:2181
+```
+
 ## Test Topic
 
 - Open a kafka consumers
