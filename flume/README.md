@@ -7,7 +7,14 @@ To test with a single message:
 ```
 
 
+
+
+
 ## lssues
+- socket stream stops
+  - Description: The generate script stops sending messages to the sockets. Occurs when the channel is memory.
+  - Cause: not 100% confirmed but cause appears to be the socket getting overload. 
+  - Solution: Implement kafka as the channel, see flume conf files for setting.
 
 - Error message seen
 ```
