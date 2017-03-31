@@ -1,7 +1,10 @@
 package bootcamp.streaming.executor
 
+import java.util
+
 import bootcamp.SlackWrap
 import kafka.serializer.StringDecoder
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerConfig, ProducerRecord}
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -58,27 +61,40 @@ object FCEStreaming {
     val ssc = new StreamingContext(sc, Seconds(microBatchRateSecs))
 
     // Kafka parameters
-
-
     val kafkaStream: DStream[(String, String)] = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](ssc, kafkaParameters,topics)
 
-    // val allMeasures = kafkaStream.map( in => (in._2,MeasurementString.unapply(in._2)))
-
     val allMeasures = kafkaStream.map( in => (in._2,getMeasure(in._2)))
-
     val goodMeasures = allMeasures.filter(_._2.isSuccess).map(_._2.get)
 
-    //Find anomolies and send to slack.
-    val anomolies = goodMeasures.filter(m => m.isAnomaly)
-    anomolies.foreachRDD(an =>
-      an.foreach(a =>
-        SlackWrap.postMessage("bootcamp", a.toString))
-    )
+    //Find anomalies and send to slack.
+    val anomalies = goodMeasures.filter(m => m.isAnomaly)
 
-    val badMeasures = allMeasures.filter(_._2.isFailure).map(_._1)
+    anomalies.foreachRDD(an => {
 
-    goodMeasures.print()
+      an.foreachPartition(p => {
+        val props = new util.HashMap[String, Object]()
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "ip-172-31-9-124.us-west-2.compute.internal:9092,ip-172-31-5-78.us-west-2.compute.internal:9092,ip-172-31-4-187.us-west-2.compute.internal:9092,ip-172-31-12-6.us-west-2.compute.internal:9092")
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+          "org.apache.kafka.common.serialization.StringSerializer")
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+          "org.apache.kafka.common.serialization.StringSerializer")
+        val producer = new KafkaProducer[String, String](props)
 
+        p.foreach(a => {
+          try
+            producer.send(new ProducerRecord[String, String]("anomalies", null, a.toString))
+          catch {
+            case e: Exception => println("AnExc" + e.getMessage)
+          }
+        })
+
+        producer.close
+
+      })
+
+    })
+
+    //val badMeasures = allMeasures.filter(_._2.isFailure).map(_._1)
 
     // Start Spark Streaming Context
     ssc.start()

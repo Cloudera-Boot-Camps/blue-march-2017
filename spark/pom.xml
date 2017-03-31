@@ -22,7 +22,7 @@
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
-            <scope>provided</scope>
+            <!--<scope>provided</scope> -->
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -96,9 +96,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.ullink.slack</groupId>
-            <artifactId>simpleslackapi</artifactId>
-            <version>0.6.0</version>
+            <groupId>org.apache.kudu</groupId>
+            <artifactId>kudu-spark_2.10</artifactId>
+            <version>1.3.0</version>
         </dependency>
     </dependencies>
 

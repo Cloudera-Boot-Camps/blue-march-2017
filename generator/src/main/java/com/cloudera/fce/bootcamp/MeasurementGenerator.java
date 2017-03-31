@@ -36,7 +36,7 @@ public class MeasurementGenerator {
 
             out.println(measurement);
             out.flush();
-            
+
             if (++i % 1000 == 0) {
                 System.out.println("Sent ttl of " + i);
             }
