@@ -5,7 +5,7 @@ import org.apache.spark.SparkContext
 object SparkJDBCImportJob {
 
   def main(args: Array[String]) {
-    FCEMain.execute(
+    SparkJDBCImport.execute(
       master    = None,
       args      = args.toList,
       jars      = List(SparkContext.jarOfObject(this).get)

@@ -95,6 +95,11 @@
             <version>${spark.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.ullink.slack</groupId>
+            <artifactId>simpleslackapi</artifactId>
+            <version>0.6.0</version>
+        </dependency>
     </dependencies>
 
     <build>

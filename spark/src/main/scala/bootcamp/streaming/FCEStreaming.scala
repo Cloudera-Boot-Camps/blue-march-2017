@@ -1,5 +1,6 @@
 package bootcamp.streaming.executor
 
+import bootcamp.SlackWrap
 import kafka.serializer.StringDecoder
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.kafka.KafkaUtils
@@ -65,7 +66,14 @@ object FCEStreaming {
 
     val allMeasures = kafkaStream.map( in => (in._2,getMeasure(in._2)))
 
-    val goodMeasures = allMeasures.filter(_._2.isSuccess).map(_._2)
+    val goodMeasures = allMeasures.filter(_._2.isSuccess).map(_._2.get)
+
+    //Find anomolies and send to slack.
+    val anomolies = goodMeasures.filter(m => m.isAnomaly)
+    anomolies.foreachRDD(an =>
+      an.foreach(a =>
+        SlackWrap.postMessage("bootcamp", a.toString))
+    )
 
     val badMeasures = allMeasures.filter(_._2.isFailure).map(_._1)
 

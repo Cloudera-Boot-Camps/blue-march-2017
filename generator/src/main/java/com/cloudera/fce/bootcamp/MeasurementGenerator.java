@@ -14,7 +14,9 @@ public class MeasurementGenerator {
         int portNumber = Integer.parseInt(args[1]);
         Socket echoSocket = new Socket(hostName, portNumber);
         PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
-        
+
+        Long i = 0L;
+
         while (true) {
             Random random = new Random();
             
@@ -31,8 +33,13 @@ public class MeasurementGenerator {
             String measurement = measurementID + delimiter + detectorID + delimiter + galaxyID +
                     delimiter + astrophysicistID + delimiter + measurementTime + delimiter +
                     amplitude1 + delimiter + amplitude2 + delimiter + amplitude3;
-            
+
             out.println(measurement);
+            out.flush();
+            
+            if (++i % 1000 == 0) {
+                System.out.println("Sent ttl of " + i);
+            }
         }
         
     }

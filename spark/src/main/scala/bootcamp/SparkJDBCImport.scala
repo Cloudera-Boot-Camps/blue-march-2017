@@ -25,7 +25,7 @@ object SparkJDBCImport {
 
   def execute(master: Option[String], args: List[String], jars: Seq[String] = Nil): Unit = {
     val sc = {
-      val conf = new SparkConf().setAppName(AppName).setJars(jars)
+      val conf = new SparkConf().setAppName(AppName)
       for (m <- master) {
         conf.setMaster(m)
       }
